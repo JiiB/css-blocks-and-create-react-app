@@ -14,18 +14,7 @@ const paths = require('./paths');
 const getClientEnvironment = require('./env');
 const CssBlocks = require("@css-blocks/jsx");
 const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
-
-const jsxCompilationOptions = {
-  compilationOptions: {},
-  optimization: {
-    rewriteIdents: true,
-    mergeDeclarations: true,
-    removeUnusedStyles: true,
-    conflictResolution: true,
-    enabled: process.env.NODE_ENV === "production",
-  },
-  aliases: {}
-};
+const jsxCompilationOptions = require('./jsxCompilationOptions');
 
 // css block rewrite and analyzer
 // analyzer is shared
@@ -140,7 +129,6 @@ module.exports = {
             options: {
               formatter: eslintFormatter,
               eslintPath: require.resolve('eslint'),
-              
             },
             loader: require.resolve('eslint-loader'),
           },
@@ -158,7 +146,8 @@ module.exports = {
           parserOpts: {
             plugins: ['jsx']
           }
-        }
+        },
+        include: paths.appSrc,
       },
       // The JSX Webpack Loader halts loader execution until after all blocks have
       // been compiled and template analyses has been run. StyleMapping data stored
@@ -168,8 +157,9 @@ module.exports = {
         options: {
           analyzer: CssBlockAnalyzer,
           rewriter: CssBlockRewriter
-        }
-      }
+        },
+        include: paths.appSrc,
+      },
       {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
@@ -190,8 +180,7 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
-            options: {
-              
+            options: {              
               compact: true,
             },
           },

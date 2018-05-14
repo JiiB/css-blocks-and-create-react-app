@@ -11,6 +11,14 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
+const CssBlocks = require("@css-blocks/jsx");
+const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
+const jsxCompilationOptions = require('./jsxCompilationOptions');
+
+// css block rewrite and analyzer
+// analyzer is shared
+const CssBlockRewriter = new CssBlocks.Rewriter(jsxCompilationOptions);
+const CssBlockAnalyzer = new CssBlocks.Analyzer(paths.appIndexJs, jsxCompilationOptions);
 
 // Webpack uses `publicPath` to determine where the app is being served from.
 // In development, we always serve from the root. This makes config easier.
@@ -123,6 +131,31 @@ module.exports = {
         include: paths.appSrc,
       },
       {
+        loader: require.resolve('babel-loader'),
+        options: {
+          plugins: [
+            require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({ rewriter: CssBlockRewriter })
+          ],
+          cacheDirectory: false,
+          compact: true,
+          parserOpts: {
+            plugins: ['jsx']
+          }
+        },
+        include: paths.appSrc,
+      },
+      // The JSX Webpack Loader halts loader execution until after all blocks have
+      // been compiled and template analyses has been run. StyleMapping data stored
+      // in shared `rewriter` object.
+      {
+        loader: require.resolve('@css-blocks/webpack/dist/src/loader'),
+        options: {
+          analyzer: CssBlockAnalyzer,
+          rewriter: CssBlockRewriter
+        },
+        include: paths.appSrc,
+      },
+      {
         // "oneOf" will traverse all following loaders until one will
         // match the requirements. When no loader matches it will fall
         // back to the "file" loader at the end of the loader list.
@@ -151,43 +184,6 @@ module.exports = {
               cacheDirectory: true,
             },
           },
-          // "postcss" loader applies autoprefixer to our CSS.
-          // "css" loader resolves paths in CSS and adds assets as dependencies.
-          // "style" loader turns CSS into JS modules that inject <style> tags.
-          // In production, we use a plugin to extract that CSS to a file, but
-          // in development "style" loader enables hot editing of CSS.
-          {
-            test: /\.css$/,
-            use: [
-              require.resolve('style-loader'),
-              {
-                loader: require.resolve('css-loader'),
-                options: {
-                  importLoaders: 1,
-                },
-              },
-              {
-                loader: require.resolve('postcss-loader'),
-                options: {
-                  // Necessary for external CSS imports to work
-                  // https://github.com/facebookincubator/create-react-app/issues/2677
-                  ident: 'postcss',
-                  plugins: () => [
-                    require('postcss-flexbugs-fixes'),
-                    autoprefixer({
-                      browsers: [
-                        '>1%',
-                        'last 4 versions',
-                        'Firefox ESR',
-                        'not ie < 9', // React doesn't support IE8 anyway
-                      ],
-                      flexbox: 'no-2009',
-                    }),
-                  ],
-                },
-              },
-            ],
-          },
           // "file" loader makes sure those assets get served by WebpackDevServer.
           // When you `import` an asset, you get its (virtual) filename.
           // In production, they would get copied to the `build` folder.
@@ -211,6 +207,13 @@ module.exports = {
     ],
   },
   plugins: [
+    new CssBlocksPlugin({
+      analyzer: CssBlockAnalyzer,
+      outputCssFile: 'blocks.css',
+      name: 'css-blocks',
+      compilationOptions: jsxCompilationOptions.compilationOptions,
+      optimization: jsxCompilationOptions.optimization
+    }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
     // <link rel="shortcut icon" href="%PUBLIC_URL%/favicon.ico">
@@ -237,12 +240,6 @@ module.exports = {
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
     new WatchMissingNodeModulesPlugin(paths.appNodeModules),
-    // Moment.js is an extremely popular library that bundles large locale files
-    // by default due to how Webpack interprets its code. This is a practical
-    // solution that requires the user to opt into importing specific locales.
-    // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
-    // You can remove this if you don't use Moment.js:
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
   ],
   // Some libraries import Node modules but don't use them in the browser.
   // Tell Webpack to provide empty mocks for them so importing them works.
