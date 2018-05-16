@@ -3,6 +3,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin'); 
+const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
 const CssBlocks = require("@css-blocks/jsx");
 const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
@@ -35,6 +36,19 @@ module.exports = {
   // This means they will be the "root" imports that are included in JS bundle.
   // The first two entry points enable "hot" CSS and auto-refreshes for JS.
   entry: [
+    // We ship a few polyfills by default: 
+    require.resolve('./polyfills'), 
+    // Include an alternative client for WebpackDevServer. A client's job is to 
+    // connect to WebpackDevServer by a socket and get notified about changes. 
+    // When you save a file, the client will either apply hot updates (in case 
+    // of CSS changes), or refresh the page (in case of JS changes). When you 
+    // make a syntax error, this client will display a syntax error overlay. 
+    // Note: instead of the default WebpackDevServer client, we use a custom one 
+    // to bring better experience for Create React App users. You can replace 
+    // the line below with these two lines if you prefer the stock client: 
+    // require.resolve('webpack-dev-server/client') + '?/', 
+    // require.resolve('webpack/hot/dev-server'), 
+    require.resolve('react-dev-utils/webpackHotDevClient'), 
     // Finally, this is your app's code:
     paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
@@ -74,17 +88,39 @@ module.exports = {
     extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
   },
   module: {
+    strictExportPresence: true,
     rules: [
+      // First, run the linter. 
+      // It's important to do this before Babel processes the JS. 
+      { 
+        test: /\.(js|jsx|mjs)$/, 
+        enforce: 'pre', 
+        use: [ 
+          { 
+            options: { 
+              formatter: eslintFormatter, 
+              eslintPath: require.resolve('eslint'), 
+               
+            }, 
+            loader: require.resolve('eslint-loader'), 
+          }, 
+        ], 
+        include: paths.appSrc, 
+      },
       {
         loader: require.resolve('babel-loader'),
         options: {
           plugins: [
-            require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({ rewriter: CssBlockRewriter })
+            require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({
+              rewriter: CssBlockRewriter
+            }),
           ],
           cacheDirectory: false,
           compact: true,
           parserOpts: {
-            plugins: ['jsx']
+            plugins: [
+              'jsx',
+            ],
           }
         },
         include: paths.appSrc,
@@ -108,7 +144,7 @@ module.exports = {
       outputCssFile: 'blocks.css',
       name: 'css-blocks',
       compilationOptions: jsxCompilationOptions.compilationOptions,
-      optimization: jsxCompilationOptions.optimization
+      optimization: jsxCompilationOptions.optimization,
     }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
