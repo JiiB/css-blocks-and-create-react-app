@@ -1,14 +1,14 @@
-'use strict';
+
 
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin'); 
+const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const paths = require('./paths');
-const CssBlocks = require("@css-blocks/jsx");
-const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
+const CssBlocks = require('@css-blocks/jsx');
+const CssBlocksPlugin = require('@css-blocks/webpack').CssBlocksPlugin;
 const jsxCompilationOptions = require('./jsxCompilationOptions');
-const getClientEnvironment = require('./env'); 
+const getClientEnvironment = require('./env');
 
 // css block rewrite and analyzer
 // analyzer is shared
@@ -21,9 +21,9 @@ const publicPath = '/';
 // `publicUrl` is just like `publicPath`, but we will provide it to our app
 // as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
 // Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
-const publicUrl = ''; 
-// Get environment variables to inject into our app. 
-const env = getClientEnvironment(publicUrl); 
+const publicUrl = '';
+// Get environment variables to inject into our app.
+const env = getClientEnvironment(publicUrl);
 
 // This is the development configuration.
 // It is focused on developer experience and fast rebuilds.
@@ -36,19 +36,19 @@ module.exports = {
   // This means they will be the "root" imports that are included in JS bundle.
   // The first two entry points enable "hot" CSS and auto-refreshes for JS.
   entry: [
-    // We ship a few polyfills by default: 
-    require.resolve('./polyfills'), 
-    // Include an alternative client for WebpackDevServer. A client's job is to 
-    // connect to WebpackDevServer by a socket and get notified about changes. 
-    // When you save a file, the client will either apply hot updates (in case 
-    // of CSS changes), or refresh the page (in case of JS changes). When you 
-    // make a syntax error, this client will display a syntax error overlay. 
-    // Note: instead of the default WebpackDevServer client, we use a custom one 
-    // to bring better experience for Create React App users. You can replace 
-    // the line below with these two lines if you prefer the stock client: 
-    // require.resolve('webpack-dev-server/client') + '?/', 
-    // require.resolve('webpack/hot/dev-server'), 
-    require.resolve('react-dev-utils/webpackHotDevClient'), 
+    // We ship a few polyfills by default:
+    require.resolve('./polyfills'),
+    // Include an alternative client for WebpackDevServer. A client's job is to
+    // connect to WebpackDevServer by a socket and get notified about changes.
+    // When you save a file, the client will either apply hot updates (in case
+    // of CSS changes), or refresh the page (in case of JS changes). When you
+    // make a syntax error, this client will display a syntax error overlay.
+    // Note: instead of the default WebpackDevServer client, we use a custom one
+    // to bring better experience for Create React App users. You can replace
+    // the line below with these two lines if you prefer the stock client:
+    // require.resolve('webpack-dev-server/client') + '?/',
+    // require.resolve('webpack/hot/dev-server'),
+    require.resolve('react-dev-utils/webpackHotDevClient'),
     // Finally, this is your app's code:
     paths.appIndexJs,
     // We include the app code last so that if there is a runtime error during
@@ -65,7 +65,7 @@ module.exports = {
     // There are also additional JS chunk files if you use code splitting.
     chunkFilename: '[name].chunk.js',
     // This is the URL that app is served from. We use "/" in development.
-    publicPath: publicPath,
+    publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
       path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -77,8 +77,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/253
     modules: ['node_modules', paths.appNodeModules].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
-      process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
-    ),
+      process.env.NODE_PATH.split(path.delimiter).filter(Boolean)),
     // These are the reasonable defaults supported by the Node ecosystem.
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
@@ -90,29 +89,29 @@ module.exports = {
   module: {
     strictExportPresence: true,
     rules: [
-      // First, run the linter. 
-      // It's important to do this before Babel processes the JS. 
-      { 
-        test: /\.(js|jsx|mjs)$/, 
-        enforce: 'pre', 
-        use: [ 
-          { 
-            options: { 
-              formatter: eslintFormatter, 
-              eslintPath: require.resolve('eslint'), 
-               
-            }, 
-            loader: require.resolve('eslint-loader'), 
-          }, 
-        ], 
-        include: paths.appSrc, 
+      // First, run the linter.
+      // It's important to do this before Babel processes the JS.
+      {
+        test: /\.(js|jsx|mjs)$/,
+        enforce: 'pre',
+        use: [
+          {
+            options: {
+              formatter: eslintFormatter,
+              eslintPath: require.resolve('eslint'),
+
+            },
+            loader: require.resolve('eslint-loader'),
+          },
+        ],
+        include: paths.appSrc,
       },
       {
         loader: require.resolve('babel-loader'),
         options: {
           plugins: [
             require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({
-              rewriter: CssBlockRewriter
+              rewriter: CssBlockRewriter,
             }),
           ],
           cacheDirectory: false,
@@ -121,7 +120,7 @@ module.exports = {
             plugins: [
               'jsx',
             ],
-          }
+          },
         },
         include: paths.appSrc,
       },
@@ -132,7 +131,7 @@ module.exports = {
         loader: require.resolve('@css-blocks/webpack/dist/src/loader'),
         options: {
           analyzer: CssBlockAnalyzer,
-          rewriter: CssBlockRewriter
+          rewriter: CssBlockRewriter,
         },
         include: paths.appSrc,
       },

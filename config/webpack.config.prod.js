@@ -1,4 +1,4 @@
-'use strict';
+
 
 const autoprefixer = require('autoprefixer');
 const path = require('path');
@@ -12,8 +12,8 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
-const CssBlocks = require("@css-blocks/jsx");
-const CssBlocksPlugin = require("@css-blocks/webpack").CssBlocksPlugin;
+const CssBlocks = require('@css-blocks/jsx');
+const CssBlocksPlugin = require('@css-blocks/webpack').CssBlocksPlugin;
 const jsxCompilationOptions = require('./jsxCompilationOptions');
 
 // css block rewrite and analyzer
@@ -51,7 +51,7 @@ const cssFilename = 'static/css/[name].[contenthash:8].css';
 // To have this structure working with relative paths, we have to use custom options.
 const extractTextPluginOptions = shouldUseRelativeAssetPaths
   ? // Making sure that the publicPath goes back to to build folder.
-    { publicPath: Array(cssFilename.split('/').length).join('../') }
+  { publicPath: Array(cssFilename.split('/').length).join('../') }
   : {};
 
 // This is the production configuration.
@@ -74,7 +74,7 @@ module.exports = {
     filename: '[name].[chunkhash:8].js',
     chunkFilename: '[name].[chunkhash:8].chunk.js',
     // We inferred the "public path" (such as / or /my-project) from homepage.
-    publicPath: publicPath,
+    publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info =>
       path
@@ -88,8 +88,7 @@ module.exports = {
     // https://github.com/facebookincubator/create-react-app/issues/253
     modules: ['node_modules', paths.appNodeModules].concat(
       // It is guaranteed to exist because we tweak it in `env.js`
-      process.env.NODE_PATH.split(path.delimiter).filter(Boolean)
-    ),
+      process.env.NODE_PATH.split(path.delimiter).filter(Boolean)),
     // These are the reasonable defaults supported by the Node ecosystem.
     // We also include JSX as a common component filename extension to support
     // some tools, although we do not recommend using it, see:
@@ -98,7 +97,7 @@ module.exports = {
     // for React Native Web.
     extensions: ['.web.js', '.mjs', '.js', '.json', '.web.jsx', '.jsx'],
     alias: {
-      
+
       // Support React Native Web
       // https://www.smashingmagazine.com/2016/08/a-glimpse-into-the-future-with-react-native-for-web/
       'react-native': 'react-native-web',
@@ -139,13 +138,13 @@ module.exports = {
         loader: require.resolve('babel-loader'),
         options: {
           plugins: [
-            require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({ rewriter: CssBlockRewriter })
+            require('@css-blocks/jsx/dist/src/transformer/babel').makePlugin({ rewriter: CssBlockRewriter }),
           ],
           cacheDirectory: false,
           compact: true,
           parserOpts: {
-            plugins: ['jsx']
-          }
+            plugins: ['jsx'],
+          },
         },
         include: paths.appSrc,
       },
@@ -156,7 +155,7 @@ module.exports = {
         loader: require.resolve('@css-blocks/webpack/dist/src/loader'),
         options: {
           analyzer: CssBlockAnalyzer,
-          rewriter: CssBlockRewriter
+          rewriter: CssBlockRewriter,
         },
         include: paths.appSrc,
       },
@@ -180,7 +179,7 @@ module.exports = {
             test: /\.(js|jsx|mjs)$/,
             include: paths.appSrc,
             loader: require.resolve('babel-loader'),
-            options: {              
+            options: {
               compact: true,
             },
           },
@@ -211,7 +210,7 @@ module.exports = {
       outputCssFile: 'blocks.css',
       name: 'css-blocks',
       compilationOptions: jsxCompilationOptions.compilationOptions,
-      optimization: jsxCompilationOptions.optimization
+      optimization: jsxCompilationOptions.optimization,
     }),
     // Makes some environment variables available in index.html.
     // The public URL is available as %PUBLIC_URL% in index.html, e.g.:
@@ -270,7 +269,7 @@ module.exports = {
       },
       minify: true,
       // For unknown URLs, fallback to the index page
-      navigateFallback: publicUrl + '/index.html',
+      navigateFallback: `${publicUrl}/index.html`,
       // Ignores URLs starting from /__ (useful for Firebase):
       // https://github.com/facebookincubator/create-react-app/issues/2237#issuecomment-302693219
       navigateFallbackWhitelist: [/^(?!\/__).*/],
