@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 
-import Footer from './components/Footer/index.jsx';
+import Footer from './components/Footer/index'
 
 class App extends Component {
   render() {
@@ -8,8 +8,8 @@ class App extends Component {
       <div>
         <Footer />
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
