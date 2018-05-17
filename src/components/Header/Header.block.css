@@ -1,0 +1,25 @@
+/* Header.block.css */
+:scope {
+	block-name: header; 
+}
+
+.header {
+	position: sticky;
+	top: 0;
+	box-shadow: 0 3px 4px 0 rgba(0,0,0,0.2);
+}
+
+.bar {
+	display: flex;
+	justify-content: space-between;
+	height: 50px;
+	width: 100%;
+	padding: 0 16px;
+	background: #73C800;
+}
+
+.icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}

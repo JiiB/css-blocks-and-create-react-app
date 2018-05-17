@@ -5,6 +5,11 @@ module.exports = {
 		"node": true,                                                                  
 	},
     "rules": {
+		"indent": ["error", "tab"],
+		"prefer-const": 0,
+		"import/extensions": 0,
+		"linebreak-style": 0,
+		"no-use-before-define": 0,
 		"import/no-dynamic-require": 0,
         "react/jsx-indent": [1, "tab"],
         "no-tabs": 0,
