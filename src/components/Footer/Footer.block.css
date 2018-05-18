@@ -1,6 +1,4 @@
 /* Footer.block.css */
-@block-reference header from '../Header/Header.block.css';
-
 :scope {
 	position: fixed;
 	bottom: 0;
